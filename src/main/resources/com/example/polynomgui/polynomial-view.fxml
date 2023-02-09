@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="141.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.polynomgui.PolynomialController">
+   <children>
+      <VBox prefHeight="155.0" prefWidth="600.0">
+         <children>
+            <HBox alignment="CENTER" prefHeight="64.0" prefWidth="622.0" spacing="2.0">
+               <children>
+                  <Label prefHeight="25.0" prefWidth="48.0" text="f(x) = " />
+                  <Spinner fx:id="coefficient0TextField" prefWidth="50.0" />
+                   <Label text=" * x^4 + " />
+                   <Spinner fx:id="coefficient1TextField" prefWidth="50.0" />
+                   <Label text=" * x^3 + " />
+                   <Spinner fx:id="coefficient2TextField" prefWidth="50.0" />
+                  <Label text=" * x^2 +  " />
+                   <Spinner fx:id="coefficient3TextField" prefWidth="50.0" valueFactory="float"/>
+                  <Label text=" * x + " />
+                   <Spinner fx:id="coefficient4TextField" prefWidth="50.0" />
+                  <Button alignment="CENTER" mnemonicParsing="false" text="Ok" />
+               </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </HBox>
+             <GridPane alignment="CENTER">
+                 <columnConstraints>
+                     <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                 </columnConstraints>
+                 <rowConstraints>
+                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                 </rowConstraints>
+                 <VBox.margin>
+                     <Insets/>
+                 </VBox.margin>
+                 <Label alignment="TOP_LEFT" snapToPixel="false" text="Funktion:"/>
+                 <Label contentDisplay="CENTER" text="Symmetirien:" GridPane.rowIndex="1"/>
+                 <Label text="Funktionstyp" GridPane.rowIndex="2"/>
+                 <Label text="y-Achsenabschnitt" GridPane.rowIndex="3"/>
+                 <Label text="Nullstellen:" GridPane.rowIndex="4"/>
+                 <Label fx:id="functionAsStringLabel" GridPane.columnIndex="1"/>
+                 <Label fx:id="symmetryLabel" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                 <Label fx:id="functionTypeLabel" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                 <Label fx:id="yInterceptLabel" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                 <Label fx:id="zeroPointsLabel" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+             </GridPane>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>
