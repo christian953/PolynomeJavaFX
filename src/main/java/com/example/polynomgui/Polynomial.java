@@ -2,9 +2,14 @@ package com.example.polynomgui;
 
 import java.lang.Math;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Polynomial {
     final double[] coefficients;
+
+    public double[] getCoefficients() {
+        return coefficients;
+    }
 
     final ArrayList<TurningPoint> maxima = new ArrayList<>();
 
@@ -22,6 +27,9 @@ public class Polynomial {
         }
     }
 
+    public boolean equals(Polynomial polynomial){
+        return Arrays.equals(polynomial.getCoefficients(), this.coefficients);
+    }
 
     public String toString() {
         final StringBuilder outputStringBuilder = new StringBuilder();

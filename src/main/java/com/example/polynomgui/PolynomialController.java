@@ -24,24 +24,27 @@ public class PolynomialController {
     public Label yInterceptLabel;
     public Label zeroPointsLabel;
     public Canvas polynomialCanvas;
-    public Slider hScaleSlider;
-    public Slider vScaleSlider;
+    public Slider xScaleSlider;
+    public Slider yScaleSlider;
     private Polynomial polynomial;
     private GraphicsContext graphicsContext;
-    private double vScale = 20;
-    private double hScale = 20;
+    private double yScale = 20;
+    private double xScale = 20;
 
 
     @FXML
     public void initialize(){
-        hScaleSlider.setMax(200);
-        hScaleSlider.setMin(1);
-        hScaleSlider.setValue(hScale);
-        hScaleSlider.setBlockIncrement(5);
-        vScaleSlider.setMax(200);
-        vScaleSlider.setMin(1);
-        vScaleSlider.setValue(vScale);
-        vScaleSlider.setBlockIncrement(5);
+        xScaleSlider.setMax(200);
+        xScaleSlider.setMin(1);
+        xScaleSlider.setValue(xScale);
+        xScaleSlider.setBlockIncrement(20);
+        xScaleSlider.setMajorTickUnit(20);
+        yScaleSlider.setMax(200);
+        yScaleSlider.setMin(1);
+        yScaleSlider.setValue(yScale);
+        yScaleSlider.setBlockIncrement(20);
+        yScaleSlider.setMajorTickUnit(20);
+
         coefficient0Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
         coefficient1Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
         coefficient2Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
@@ -53,6 +56,10 @@ public class PolynomialController {
 
     @FXML
     protected void onSubmitButtonClicked(){
+        displayPolynomial();
+    }
+
+    private void displayPolynomial() {
         polynomial = new Polynomial(getCoefficients());
         setAttributeDisplay();
         drawPolynomialToCanvas(polynomial);
@@ -74,7 +81,6 @@ public class PolynomialController {
         coefficients[2] = coefficient2Spinner.getValue();
         coefficients[3] = coefficient3Spinner.getValue();
         coefficients[4] = coefficient4Spinner.getValue();
-        System.out.println(Arrays.toString(coefficients));
         return coefficients;
     }
 
@@ -105,41 +111,61 @@ public class PolynomialController {
         drawSquares();
         graphicsContext.setStroke(Color.GREEN);
         graphicsContext.setLineWidth(2);
-        double lastX = (-polynomialCanvas.getWidth()/2)/ hScale;
+        double lastX = (-polynomialCanvas.getWidth()/2)/ xScale;
         double lastY = polynomial.calculateValue(lastX);
-        for (double x = (-polynomialCanvas.getWidth()/2)/ hScale; x <= (polynomialCanvas.getWidth()/2)/ hScale; x += 0.1){
+        double drawingPrecision = 0.1;
+        for (double x = (-polynomialCanvas.getWidth()/2)/ xScale; x <= (polynomialCanvas.getWidth()/2)/ xScale; x += drawingPrecision){
             double y = polynomial.calculateValue(x);
-            graphicsContext.strokeLine(lastX* hScale + polynomialCanvas.getWidth()/2, -lastY * vScale + polynomialCanvas.getHeight()/2,
-                                    x * hScale + polynomialCanvas.getWidth()/2, -y * vScale + polynomialCanvas.getHeight()/2);
+            graphicsContext.strokeLine(lastX* xScale + polynomialCanvas.getWidth()/2, -lastY * yScale + polynomialCanvas.getHeight()/2,
+                                    x * xScale + polynomialCanvas.getWidth()/2, -y * yScale + polynomialCanvas.getHeight()/2);
             lastX = x;
             lastY = y;
         }
     }
 
-    private void drawSquares(){
+    private void drawSquares() {
         graphicsContext.setStroke(Color.BLACK);
         graphicsContext.setLineWidth(1);
-        graphicsContext.strokeLine(polynomialCanvas.getWidth()/2, 0, polynomialCanvas.getWidth()/2, polynomialCanvas.getHeight());
-        graphicsContext.strokeLine(0, polynomialCanvas.getHeight()/2, polynomialCanvas.getWidth(),polynomialCanvas.getHeight()/2);
+
+        double canvasWidth = polynomialCanvas.getWidth();
+        double canvasHeight = polynomialCanvas.getHeight();
+        graphicsContext.strokeLine(canvasWidth / 2, 0, canvasWidth / 2, canvasHeight);
+        graphicsContext.strokeLine(0, canvasHeight / 2, canvasWidth, canvasHeight / 2);
+
         graphicsContext.setStroke(Color.GRAY);
         graphicsContext.setLineWidth(0.2);
-        for(double xCoordinate = (polynomialCanvas.getWidth()/vScale) % polynomialCanvas.getWidth(); xCoordinate <= polynomialCanvas.getWidth(); xCoordinate += polynomialCanvas.getWidth()/vScale){
-            System.out.println(xCoordinate);
-            graphicsContext.strokeLine(xCoordinate, 0, xCoordinate, polynomialCanvas.getHeight());
+
+        double xSquares = canvasWidth / xScale;
+        double ySquares = canvasHeight / yScale;
+        double xCoord, yCoord;
+
+        for (xCoord = canvasWidth / 2; xCoord >= 0; xCoord -= xSquares) {
+            graphicsContext.strokeLine(xCoord, 0, xCoord, canvasHeight);
+        }
+        for (xCoord = canvasWidth / 2 + xSquares; xCoord <= canvasWidth; xCoord += xSquares) {
+            graphicsContext.strokeLine(xCoord, 0, xCoord, canvasHeight);
+        }
+
+        for (yCoord = canvasHeight / 2; yCoord >= 0; yCoord -= ySquares) {
+            graphicsContext.strokeLine(0, yCoord, canvasWidth, yCoord);
+        }
+        for (yCoord = canvasHeight / 2 + ySquares; yCoord <= canvasHeight; yCoord += ySquares) {
+            graphicsContext.strokeLine(0, yCoord, canvasWidth, yCoord);
         }
     }
 
-    public void onHSlider(MouseEvent mouseEvent) {
+    public void onXSlider() {
         clearCanvas();
-        hScale = hScaleSlider.getValue();
+        xScale = xScaleSlider.getValue();
         drawSquares();
-        onSubmitButtonClicked();
+        displayPolynomial();
     }
-    public void onVSlider(){
+    public void onYSlider(){
         clearCanvas();
-        vScale = vScaleSlider.getValue();
+        yScale = yScaleSlider.getValue();
         drawSquares();
-        onSubmitButtonClicked();
+        displayPolynomial();
+
     }
 
     private void clearCanvas(){

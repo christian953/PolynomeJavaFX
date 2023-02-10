@@ -62,9 +62,9 @@
                 <Label fx:id="functionTypeLabel" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                 <Label fx:id="yInterceptLabel" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                 <Label fx:id="zeroPointsLabel" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-            <Slider fx:id="vScaleSlider" onMouseDragEntered="#onVSlider" onMouseDragExited="#onVSlider" onMouseDragOver="#onVSlider" onMouseDragReleased="#onVSlider" onMouseDragged="#onVSlider" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+            <Slider fx:id="yScaleSlider" onMouseDragEntered="#onYSlider" onMouseDragExited="#onYSlider" onMouseDragOver="#onYSlider" onMouseDragReleased="#onYSlider" onMouseDragged="#onYSlider" GridPane.columnIndex="1" GridPane.rowIndex="6" />
             <Label text="y-Skalierung:" GridPane.rowIndex="6" />
-            <Slider fx:id="hScaleSlider" onMouseDragEntered="#onHSlider" onMouseDragExited="#onHSlider" onMouseDragOver="#onHSlider" onMouseDragReleased="#onHSlider" onMouseDragged="#onHSlider" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <Slider fx:id="xScaleSlider" onMouseDragEntered="#onXSlider" onMouseDragExited="#onXSlider" onMouseDragOver="#onXSlider" onMouseDragReleased="#onXSlider" onMouseDragged="#onXSlider" GridPane.columnIndex="1" GridPane.rowIndex="5" />
             <Label text="x-Skalierung" GridPane.rowIndex="5" />
             </GridPane>
             <Canvas fx:id="polynomialCanvas" height="400.0" width="400.0" />
