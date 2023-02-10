@@ -62,6 +62,7 @@ public class PolynomialController {
     private void displayPolynomial() {
         polynomial = new Polynomial(getCoefficients());
         setAttributeDisplay();
+        clearCanvas();
         drawPolynomialToCanvas(polynomial);
     }
 
@@ -107,17 +108,16 @@ public class PolynomialController {
     }
 
     private void drawPolynomialToCanvas(Polynomial polynomialToDraw){
-        clearCanvas();
         drawSquares();
-        graphicsContext.setStroke(Color.GREEN);
-        graphicsContext.setLineWidth(2);
+        graphicsContext.setStroke(Color.RED);
+        graphicsContext.setLineWidth(1);
         double lastX = (-polynomialCanvas.getWidth()/2)/ xScale;
-        double lastY = polynomial.calculateValue(lastX);
+        double lastY = polynomialToDraw.calculateValue(lastX);
         double drawingPrecision = 0.1;
         for (double x = (-polynomialCanvas.getWidth()/2)/ xScale; x <= (polynomialCanvas.getWidth()/2)/ xScale; x += drawingPrecision){
-            double y = polynomial.calculateValue(x);
-            graphicsContext.strokeLine(lastX* xScale + polynomialCanvas.getWidth()/2, -lastY * yScale + polynomialCanvas.getHeight()/2,
-                                    x * xScale + polynomialCanvas.getWidth()/2, -y * yScale + polynomialCanvas.getHeight()/2);
+            double y = polynomialToDraw.calculateValue(x);
+            graphicsContext.strokeLine(lastX * xScale + polynomialCanvas.getWidth()/2, -lastY * yScale + polynomialCanvas.getHeight()/2,
+                    x * xScale + polynomialCanvas.getWidth()/2, -y * yScale + polynomialCanvas.getHeight()/2);
             lastX = x;
             lastY = y;
         }
