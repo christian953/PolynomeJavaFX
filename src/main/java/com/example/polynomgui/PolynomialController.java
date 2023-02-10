@@ -24,18 +24,24 @@ public class PolynomialController {
     public Label yInterceptLabel;
     public Label zeroPointsLabel;
     public Canvas polynomialCanvas;
-    public Slider scaleSlider;
+    public Slider hScaleSlider;
+    public Slider vScaleSlider;
     private Polynomial polynomial;
     private GraphicsContext graphicsContext;
     private double vScale = 20;
-    private double hScale = 10;
+    private double hScale = 20;
 
 
     @FXML
     public void initialize(){
-        scaleSlider.setMax(200);
-        scaleSlider.setMin(1);
-        scaleSlider.setValue(vScale);
+        hScaleSlider.setMax(200);
+        hScaleSlider.setMin(1);
+        hScaleSlider.setValue(hScale);
+        hScaleSlider.setBlockIncrement(5);
+        vScaleSlider.setMax(200);
+        vScaleSlider.setMin(1);
+        vScaleSlider.setValue(vScale);
+        vScaleSlider.setBlockIncrement(5);
         coefficient0Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
         coefficient1Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
         coefficient2Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
@@ -111,40 +117,29 @@ public class PolynomialController {
     }
 
     private void drawSquares(){
+        graphicsContext.setStroke(Color.BLACK);
+        graphicsContext.setLineWidth(1);
+        graphicsContext.strokeLine(polynomialCanvas.getWidth()/2, 0, polynomialCanvas.getWidth()/2, polynomialCanvas.getHeight());
+        graphicsContext.strokeLine(0, polynomialCanvas.getHeight()/2, polynomialCanvas.getWidth(),polynomialCanvas.getHeight()/2);
         graphicsContext.setStroke(Color.GRAY);
-        graphicsContext.setLineWidth(0.5);
-        int hSquares = (int) (polynomialCanvas.getWidth() / hScale);
-        int vSquares = (int) (polynomialCanvas.getHeight() / vScale);
-        double xCoord = 0;
-        for (int i = 0; i <= hSquares; i++){
-            if(i == hSquares / 2){
-                graphicsContext.setStroke(Color.BLACK);
-                graphicsContext.setLineWidth(1);
-                graphicsContext.strokeLine(polynomialCanvas.getWidth()/2, 0, polynomialCanvas.getWidth()/2, polynomialCanvas.getHeight());
-                graphicsContext.setStroke(Color.GRAY);
-                graphicsContext.setLineWidth(0.5);
-            }
-            graphicsContext.strokeLine(xCoord, 0, xCoord, polynomialCanvas.getHeight());
-            xCoord += hScale;
-        }
-        double yCoord = 0;
-        for (int i = 0; i <= vSquares; i++){
-            if(i == vSquares /2){
-                graphicsContext.setStroke(Color.BLACK);
-                graphicsContext.setLineWidth(1);
-                graphicsContext.strokeLine(0, yCoord, polynomialCanvas.getWidth(), yCoord);
-                graphicsContext.setStroke(Color.GRAY);
-                graphicsContext.setLineWidth(0.5);
-            }
-            graphicsContext.strokeLine(0, yCoord, polynomialCanvas.getWidth(), yCoord);
-            yCoord += vScale;
+        graphicsContext.setLineWidth(0.2);
+        for(double xCoordinate = (polynomialCanvas.getWidth()/vScale) % polynomialCanvas.getWidth(); xCoordinate <= polynomialCanvas.getWidth(); xCoordinate += polynomialCanvas.getWidth()/vScale){
+            System.out.println(xCoordinate);
+            graphicsContext.strokeLine(xCoordinate, 0, xCoordinate, polynomialCanvas.getHeight());
         }
     }
 
-    public void onSlider(MouseEvent mouseEvent) {
+    public void onHSlider(MouseEvent mouseEvent) {
         clearCanvas();
-        vScale = scaleSlider.getValue();
+        hScale = hScaleSlider.getValue();
         drawSquares();
+        onSubmitButtonClicked();
+    }
+    public void onVSlider(){
+        clearCanvas();
+        vScale = vScaleSlider.getValue();
+        drawSquares();
+        onSubmitButtonClicked();
     }
 
     private void clearCanvas(){
