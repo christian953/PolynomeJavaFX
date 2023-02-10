@@ -31,6 +31,7 @@ public class PolynomialController {
     private GraphicsContext graphicsContext;
     private double yScale = 20;
     private double xScale = 20;
+    private double drawingPrecision = 0.1;
 
 
     @FXML
@@ -128,7 +129,6 @@ public class PolynomialController {
         graphicsContext.setLineWidth(1);
         double lastX = (-polynomialCanvas.getWidth()/xScale ) /2;
         double lastY = polynomialToDraw.calculateValue(lastX);
-        double drawingPrecision = 0.5;
         for (double x = (-polynomialCanvas.getWidth()/2) / xScale; x <= (polynomialCanvas.getWidth()/2) / xScale; x += drawingPrecision){
             double y = polynomialToDraw.calculateValue(x);
             graphicsContext.strokeLine(adaptXCoordinate(lastX), adaptYCoordinate(lastY), adaptXCoordinate(x), adaptYCoordinate(y));
