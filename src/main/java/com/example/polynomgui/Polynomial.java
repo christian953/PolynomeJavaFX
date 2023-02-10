@@ -4,25 +4,27 @@ import java.lang.Math;
 import java.util.ArrayList;
 
 public class Polynomial {
-    double[] coefficients;
+    final double[] coefficients;
 
-    ArrayList<TurningPoint> maxima = new ArrayList<>();
+    final ArrayList<TurningPoint> maxima = new ArrayList<>();
 
-    ArrayList<TurningPoint> minima = new ArrayList<>();
-
-    InflectionPoint[] inflectionPoints = new InflectionPoint[getDegree()-2];
+    final ArrayList<TurningPoint> minima = new ArrayList<>();
+    InflectionPoint[] inflectionPoints;
 
     private static final String[] exponentCharacters = {"\u00B2" , "\u00B3", "\u2074"};
-
-    Polynomial(double[] coefficients) {
+    Polynomial(final double[] coefficients) {
+        super();
         this.coefficients = coefficients;
-        if(this.getDegree() >= 2) {
+        if (this.getDegree() >= 2) {
             this.specialPoints();
+            inflectionPoints = new InflectionPoint[getDegree() - 2];
+
         }
     }
 
+
     public String toString() {
-        StringBuilder outputStringBuilder = new StringBuilder();
+        final StringBuilder outputStringBuilder = new StringBuilder();
         outputStringBuilder.append("f(x) = ");
         int segments = 0;
         for(int i = coefficients.length - 1; i >= 0; i--){
@@ -48,7 +50,7 @@ public class Polynomial {
         return outputStringBuilder.toString();
     }
 
-    public double calculateValue(Double xValue) {
+    public double calculateValue(final Double xValue) {
         double sum = 0;
         for(int i = 0; i < coefficients.length; i++){
             sum += coefficients[i] * Math.pow(xValue, i);
@@ -57,7 +59,7 @@ public class Polynomial {
     }
 
     public int getDegree() {
-        for(int i = coefficients.length-1 ; i > 0; i--){
+        for(int i = this.coefficients.length-1 ; i > 0; i--){
             if(coefficients[i] != 0){
                 return i;
             }
@@ -88,7 +90,7 @@ public class Polynomial {
     }
 
     public double[] getDerivationCoefficients() {
-        double[] derivationCoefficients = {0,0,0,0,0};
+        final double[] derivationCoefficients = {0,0,0,0,0};
         for(int i = 1; i < coefficients.length; i++){
             derivationCoefficients[i-1] = coefficients[i] * i;
         }
@@ -96,32 +98,35 @@ public class Polynomial {
     }
 
     public Polynomial getDerivation() {
-        double[] derivationCoefficients = getDerivationCoefficients();
+        final double[] derivationCoefficients = getDerivationCoefficients();
         return new Polynomial(derivationCoefficients);
     }
 
     public double[] findZeroPoints() {
         final int degree = this.getDegree();
-        double[] zeroPoints = new double[degree];
-        if (degree == 0) {
-            return zeroPoints;
-        } else if (degree == 1) {
-            double zeroPoint = -(coefficients[0] / coefficients[1]);
-            zeroPoints[0] = zeroPoint;
-        } else if (degree == 2) {
-            if (coefficients[2] == 1) {
-                zeroPoints[0] = -(coefficients[1] / 2) + Math.sqrt(Math.pow(coefficients[1] / 2, 2) - coefficients[0]);
-                zeroPoints[1] = -(coefficients[1] / 2) - Math.sqrt(Math.pow(coefficients[1] / 2, 2) - coefficients[0]);
+        if (degree <= 2) {
+            final double[] zeroPoints = new double[degree];
+            if (degree == 0) {
+                return zeroPoints;
+            } else if (degree == 1) {
+                final double zeroPoint = -(coefficients[0] / coefficients[1]);
+                zeroPoints[0] = zeroPoint;
             } else {
-                zeroPoints[0] = -(coefficients[1] / coefficients[2] / 2) + Math.sqrt(Math.pow(coefficients[1] / coefficients[2] / 2, 2) - coefficients[0] / coefficients[2]);
-                zeroPoints[1] = -(coefficients[1] / coefficients[2] / 2) - Math.sqrt(Math.pow(coefficients[1] / coefficients[2] / 2, 2) - coefficients[0] / coefficients[2]);
+                if (coefficients[2] == 1) {
+                    zeroPoints[0] = -(coefficients[1] / 2) + Math.sqrt(Math.pow(coefficients[1] / 2, 2) - coefficients[0]);
+                    zeroPoints[1] = -(coefficients[1] / 2) - Math.sqrt(Math.pow(coefficients[1] / 2, 2) - coefficients[0]);
+                } else {
+                    zeroPoints[0] = -(coefficients[1] / coefficients[2] / 2) + Math.sqrt(Math.pow(coefficients[1] / coefficients[2] / 2, 2) - coefficients[0] / coefficients[2]);
+                    zeroPoints[1] = -(coefficients[1] / coefficients[2] / 2) - Math.sqrt(Math.pow(coefficients[1] / coefficients[2] / 2, 2) - coefficients[0] / coefficients[2]);
+                }
+                return zeroPoints;
             }
             return zeroPoints;
         }
-        return zeroPoints;
+        return new double[0];
     }
 
-    private double positive(double num) {
+    private double positive(final double num) {
         if (num > 0){
             return num;
         }else {
@@ -130,12 +135,12 @@ public class Polynomial {
     }
 
     private void specialPoints() {
-        Polynomial firstDerivation = this.getDerivation();
-        Polynomial secondDerivation = firstDerivation.getDerivation();
-        double[] firstDerivationZeroPoints = firstDerivation.findZeroPoints();
+        final Polynomial firstDerivation = this.getDerivation();
+        final Polynomial secondDerivation = firstDerivation.getDerivation();
+        final double[] firstDerivationZeroPoints = firstDerivation.findZeroPoints();
         //TurningPoints
-        for (double firstDerivationZeroPoint : firstDerivationZeroPoints) {
-            double secondDerivationValue = secondDerivation.calculateValue(firstDerivationZeroPoint);
+        for (final double firstDerivationZeroPoint : firstDerivationZeroPoints) {
+            final double secondDerivationValue = secondDerivation.calculateValue(firstDerivationZeroPoint);
             if (secondDerivationValue > 0) {
                 minima.add(new TurningPoint(firstDerivationZeroPoint, this.calculateValue(firstDerivationZeroPoint)));
             }
@@ -143,8 +148,8 @@ public class Polynomial {
                 maxima.add(new TurningPoint(firstDerivationZeroPoint, this.calculateValue(firstDerivationZeroPoint)));
             }
         }
-        //InflectionPoints
-
     }
+
+
 
 }

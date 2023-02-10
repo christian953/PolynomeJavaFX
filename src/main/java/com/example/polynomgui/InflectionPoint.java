@@ -1,7 +1,8 @@
 package com.example.polynomgui;
 
 public class InflectionPoint extends SpecialPoint {
-    public InflectionPoint(double xValue,double yValue) {
+    public InflectionPoint(final double xValue, final double yValue) {
+        super();
         this.xValue = xValue;
         this.yValue = yValue;
     }
@@ -10,7 +11,7 @@ public class InflectionPoint extends SpecialPoint {
         return isRightLeftTurning;
     }
 
-    public void setRightLeftTurning(boolean rightLeftTurning) {
+    public void setRightLeftTurning(final boolean rightLeftTurning) {
         isRightLeftTurning = rightLeftTurning;
     }
 

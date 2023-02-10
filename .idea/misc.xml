@@ -7,6 +7,10 @@
       </list>
     </option>
   </component>
+  <component name="ProjectResources">
+    <resource url="http://javafx.com/fxml/1" location="$PROJECT_DIR$" />
+    <xml-schema-version>XMLSchema_1_1</xml-schema-version>
+  </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_18" default="true" project-jdk-name="18" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
