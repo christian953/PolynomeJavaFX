@@ -7,7 +7,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 
 import java.util.Arrays;
@@ -51,12 +52,37 @@ public class PolynomialController {
         coefficient3Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
         coefficient4Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
         this.graphicsContext = polynomialCanvas.getGraphicsContext2D();
-        drawSquares();
+        drawCoordinateGrid();
     }
 
     @FXML
     protected void onSubmitButtonClicked(){
         displayPolynomial();
+    }
+
+    @FXML
+    public void onXSliderMoved() {
+        clearCanvas();
+        xScale = xScaleSlider.getValue();
+        drawCoordinateGrid();
+        displayPolynomial();
+    }
+
+    @FXML
+    public void onYSliderMoved(){
+        clearCanvas();
+        yScale = yScaleSlider.getValue();
+        drawCoordinateGrid();
+        displayPolynomial();
+        System.out.println(yScale);
+
+    }
+
+    @FXML
+    public void onEnterPressed(KeyEvent keyEvent) {
+        if(keyEvent.getCode().equals(KeyCode.ENTER)){
+            displayPolynomial();
+        }
     }
 
     private void displayPolynomial() {
@@ -72,17 +98,6 @@ public class PolynomialController {
         yInterceptLabel.setText(Double.toString(polynomial.calculateValue(0.0)));
         zeroPointsLabel.setText(Arrays.toString(polynomial.findZeroPoints()));
         symmetryLabel.setText(getSymmetryString());
-
-    }
-
-    private double[] getCoefficients(){
-        final double[] coefficients = new double[5];
-        coefficients[0] = coefficient0Spinner.getValue();
-        coefficients[1] = coefficient1Spinner.getValue();
-        coefficients[2] = coefficient2Spinner.getValue();
-        coefficients[3] = coefficient3Spinner.getValue();
-        coefficients[4] = coefficient4Spinner.getValue();
-        return coefficients;
     }
 
     private String getSymmetryString(){
@@ -108,22 +123,29 @@ public class PolynomialController {
     }
 
     private void drawPolynomialToCanvas(Polynomial polynomialToDraw){
-        drawSquares();
+        drawCoordinateGrid();
         graphicsContext.setStroke(Color.RED);
         graphicsContext.setLineWidth(1);
-        double lastX = (-polynomialCanvas.getWidth()/2)/ xScale;
+        double lastX = (-polynomialCanvas.getWidth()/xScale ) /2;
         double lastY = polynomialToDraw.calculateValue(lastX);
-        double drawingPrecision = 0.1;
-        for (double x = (-polynomialCanvas.getWidth()/2)/ xScale; x <= (polynomialCanvas.getWidth()/2)/ xScale; x += drawingPrecision){
+        double drawingPrecision = 0.5;
+        for (double x = (-polynomialCanvas.getWidth()/2) / xScale; x <= (polynomialCanvas.getWidth()/2) / xScale; x += drawingPrecision){
             double y = polynomialToDraw.calculateValue(x);
-            graphicsContext.strokeLine(lastX * xScale + polynomialCanvas.getWidth()/2, -lastY * yScale + polynomialCanvas.getHeight()/2,
-                    x * xScale + polynomialCanvas.getWidth()/2, -y * yScale + polynomialCanvas.getHeight()/2);
+            graphicsContext.strokeLine(adaptXCoordinate(lastX), adaptYCoordinate(lastY), adaptXCoordinate(x), adaptYCoordinate(y));
             lastX = x;
             lastY = y;
         }
     }
 
-    private void drawSquares() {
+    private double adaptXCoordinate(double mathematicalXCoordinate){
+        return mathematicalXCoordinate * xScale + polynomialCanvas.getWidth()/2;
+    }
+
+    private double adaptYCoordinate(double mathematicalYCoordinate){
+        return -mathematicalYCoordinate * yScale + polynomialCanvas.getHeight()/2;
+    };
+
+    private void drawCoordinateGrid() {
         graphicsContext.setStroke(Color.BLACK);
         graphicsContext.setLineWidth(1);
 
@@ -137,35 +159,38 @@ public class PolynomialController {
 
         double xSquares = canvasWidth / xScale;
         double ySquares = canvasHeight / yScale;
+        System.out.println("Squares:" + xSquares);
         double xCoord, yCoord;
+        double xLineSpacing = canvasWidth/xSquares;
+        double yLineSpacing = canvasHeight/ySquares;
 
-        for (xCoord = canvasWidth / 2; xCoord >= 0; xCoord -= xSquares) {
+        for (xCoord = canvasWidth / 2; xCoord >= 0; xCoord -= xLineSpacing) {
             graphicsContext.strokeLine(xCoord, 0, xCoord, canvasHeight);
         }
-        for (xCoord = canvasWidth / 2 + xSquares; xCoord <= canvasWidth; xCoord += xSquares) {
+        for (xCoord = canvasWidth / 2 ; xCoord <= canvasWidth; xCoord += xLineSpacing) {
             graphicsContext.strokeLine(xCoord, 0, xCoord, canvasHeight);
         }
-
-        for (yCoord = canvasHeight / 2; yCoord >= 0; yCoord -= ySquares) {
+        for (yCoord = canvasHeight / 2; yCoord >= 0; yCoord -= yLineSpacing) {
             graphicsContext.strokeLine(0, yCoord, canvasWidth, yCoord);
         }
-        for (yCoord = canvasHeight / 2 + ySquares; yCoord <= canvasHeight; yCoord += ySquares) {
+        for (yCoord = canvasHeight / 2 ; yCoord <= canvasHeight; yCoord += yLineSpacing) {
             graphicsContext.strokeLine(0, yCoord, canvasWidth, yCoord);
         }
+        drawNumbers();
     }
 
-    public void onXSlider() {
-        clearCanvas();
-        xScale = xScaleSlider.getValue();
-        drawSquares();
-        displayPolynomial();
-    }
-    public void onYSlider(){
-        clearCanvas();
-        yScale = yScaleSlider.getValue();
-        drawSquares();
-        displayPolynomial();
+    private void drawNumbers() {
 
+    }
+
+    private double[] getCoefficients(){
+        final double[] coefficients = new double[5];
+        coefficients[0] = coefficient0Spinner.getValue();
+        coefficients[1] = coefficient1Spinner.getValue();
+        coefficients[2] = coefficient2Spinner.getValue();
+        coefficients[3] = coefficient3Spinner.getValue();
+        coefficients[4] = coefficient4Spinner.getValue();
+        return coefficients;
     }
 
     private void clearCanvas(){
