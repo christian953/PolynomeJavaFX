@@ -1,6 +1,7 @@
 package com.example.polynomgui;
 
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
@@ -9,6 +10,8 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
 
 import java.util.Arrays;
@@ -104,9 +107,19 @@ public class PolynomialController {
         }
     }
 
+    @FXML
+    public void onScrolledOnCanvas(ScrollEvent scrollEvent) {
+        if(xScale + scrollEvent.getDeltaY()/10 > 0 && yScale + scrollEvent.getDeltaY() /10 > 0){
+            xScale += (scrollEvent.getDeltaY() /10);
+            yScale += (scrollEvent.getDeltaY() / 10);
+            xScaleSlider.setValue(xScale);
+            yScaleSlider.setValue(yScale);
+            updateCanvas();}
+    }
+
     private void displayPolynomial() {
         polynomial = new Polynomial(getCoefficientsFromCoefficientSpinners());
-        setAttributeDisplay();
+        setPolynomialAttributeLabels();
         updateCanvas();
     }
 
@@ -118,7 +131,7 @@ public class PolynomialController {
         }
     }
 
-    private void setAttributeDisplay() {
+    private void setPolynomialAttributeLabels() {
         functionAsStringLabel.setText(polynomial.toString());
         functionTypeLabel.setText(getPolynomialTypeString());
         yInterceptLabel.setText(Double.toString(polynomial.calculateValue(0.0)));
@@ -172,7 +185,7 @@ public class PolynomialController {
         return -mathematicalYCoordinate * yScale + polynomialCanvas.getHeight()/2;
     };
 
-    private void drawCoordinateGrid() {
+    private void drawCoordinateGrid(){
         double canvasWidth = polynomialCanvas.getWidth();
         double canvasHeight = polynomialCanvas.getHeight();
 
@@ -224,5 +237,14 @@ public class PolynomialController {
             graphicsContext.strokeLine(adaptXCoordinate(zeroPoint),adaptYCoordinate(polynomial.calculateValue(zeroPoint)),
                     adaptXCoordinate(zeroPoint),adaptYCoordinate(polynomial.calculateValue(zeroPoint)));
         }
+    }
+
+    public void onMouseEnteredCanvas(MouseEvent mouseEvent){
+        System.out.println((Canvas)mouseEvent.getSource());
+        ((Canvas) mouseEvent.getSource()).getScene().setCursor(Cursor.CROSSHAIR);
+    }
+
+    public void onMouseExitedCanvas(MouseEvent mouseEvent){
+        ((Canvas) mouseEvent.getSource()).getScene().setCursor(Cursor.DEFAULT);
     }
 }
