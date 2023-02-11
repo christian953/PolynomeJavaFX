@@ -37,6 +37,21 @@ public class PolynomialController {
 
     @FXML
     public void initialize(){
+        initializeSliders();
+        initializeSpinners();
+        this.graphicsContext = polynomialCanvas.getGraphicsContext2D();
+        drawCoordinateGrid();
+    }
+
+    private void initializeSpinners() {
+        coefficient0Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
+        coefficient1Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
+        coefficient2Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
+        coefficient3Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
+        coefficient4Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
+    }
+
+    private void initializeSliders() {
         //Initialize xScaleSlider
         xScaleSlider.setMax(polynomialCanvas.getWidth()/2);
         xScaleSlider.setMin(1);
@@ -57,16 +72,6 @@ public class PolynomialController {
         drawingPrecisionSlider.setValue(0.1);
         drawingPrecisionSlider.setBlockIncrement(0.01);
         drawingPrecisionSlider.setMajorTickUnit(0.01);
-
-        //Setting ValueFactories for coefficientSpinners
-        coefficient0Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
-        coefficient1Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
-        coefficient2Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
-        coefficient3Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
-        coefficient4Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
-
-        this.graphicsContext = polynomialCanvas.getGraphicsContext2D();
-        drawCoordinateGrid();
     }
 
     @FXML
@@ -186,22 +191,15 @@ public class PolynomialController {
         double xLineSpacing = canvasWidth/columns;
         double yLineSpacing = canvasHeight/rows;
 
-        for (xCoord = canvasWidth / 2; xCoord >= 0; xCoord -= xLineSpacing) {
+        for (xCoord = canvasWidth / 2; xCoord >= 0; xCoord -= xLineSpacing){
             graphicsContext.strokeLine(xCoord, 0, xCoord, canvasHeight);
+            graphicsContext.strokeLine(canvasWidth - xCoord, 0, canvasWidth - xCoord, canvasHeight);
         }
-        for (xCoord = canvasWidth / 2 ; xCoord <= canvasWidth; xCoord += xLineSpacing) {
-            graphicsContext.strokeLine(xCoord, 0, xCoord, canvasHeight);
-        }
+
         for (yCoord = canvasHeight / 2; yCoord >= 0; yCoord -= yLineSpacing) {
             graphicsContext.strokeLine(0, yCoord, canvasWidth, yCoord);
+            graphicsContext.strokeLine(0, canvasHeight - yCoord, canvasWidth, canvasHeight - yCoord);
         }
-        for (yCoord = canvasHeight / 2 ; yCoord <= canvasHeight; yCoord += yLineSpacing) {
-            graphicsContext.strokeLine(0, yCoord, canvasWidth, yCoord);
-        }
-        drawNumbers();
-    }
-
-    private void drawNumbers() {
 
     }
 
