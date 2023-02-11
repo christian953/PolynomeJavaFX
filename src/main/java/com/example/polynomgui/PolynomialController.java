@@ -14,8 +14,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
 
-import java.util.Arrays;
-
 public class PolynomialController {
     public Spinner<Double> coefficient0Spinner;
     public Spinner<Double> coefficient1Spinner;
@@ -46,7 +44,7 @@ public class PolynomialController {
         drawCoordinateGrid();
     }
 
-    private void initializeSpinners() {
+    private void initializeSpinners(){
         coefficient0Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
         coefficient1Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
         coefficient2Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
@@ -54,22 +52,19 @@ public class PolynomialController {
         coefficient4Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
     }
 
-    private void initializeSliders() {
-        //Initialize xScaleSlider
-        xScaleSlider.setMax(polynomialCanvas.getWidth()/2);
+    private void initializeSliders(){
+        xScaleSlider.setMax(polynomialCanvas.getWidth() / 2);
         xScaleSlider.setMin(1);
         xScaleSlider.setValue(xScale);
         xScaleSlider.setBlockIncrement(20);
         xScaleSlider.setMajorTickUnit(20);
 
-        //Initialize yScaleSlider
-        yScaleSlider.setMax(polynomialCanvas.getHeight()/2);
+        yScaleSlider.setMax(polynomialCanvas.getHeight() / 2);
         yScaleSlider.setMin(1);
         yScaleSlider.setValue(yScale);
         yScaleSlider.setBlockIncrement(20);
         yScaleSlider.setMajorTickUnit(20);
 
-        //Initialize drawingPrecisionSlider
         drawingPrecisionSlider.setMax(1);
         drawingPrecisionSlider.setMin(0.01);
         drawingPrecisionSlider.setValue(0.1);
@@ -79,11 +74,11 @@ public class PolynomialController {
 
     @FXML
     protected void onSubmitButtonClicked(){
-        displayPolynomial();
+        setPolynomial();
     }
 
     @FXML
-    public void onXSliderMoved() {
+    public void onXSliderMoved(){
         xScale = xScaleSlider.getValue();
         updateCanvas();
     }
@@ -101,29 +96,39 @@ public class PolynomialController {
     }
 
     @FXML
-    public void onEnterPressed(KeyEvent keyEvent) {
+    public void onEnterPressed(KeyEvent keyEvent){
         if(keyEvent.getCode().equals(KeyCode.ENTER)){
-            displayPolynomial();
+            setPolynomial();
         }
     }
 
     @FXML
-    public void onScrolledOnCanvas(ScrollEvent scrollEvent) {
-        if(xScale + scrollEvent.getDeltaY()/10 > 0 && yScale + scrollEvent.getDeltaY() /10 > 0){
-            xScale += (scrollEvent.getDeltaY() /10);
+    public void onScrolledOnCanvas(ScrollEvent scrollEvent){
+        if(xScale + scrollEvent.getDeltaY() / 10 > 0 && yScale + scrollEvent.getDeltaY() / 10 > 0){
+            xScale += (scrollEvent.getDeltaY() / 10);
             yScale += (scrollEvent.getDeltaY() / 10);
             xScaleSlider.setValue(xScale);
             yScaleSlider.setValue(yScale);
             updateCanvas();}
     }
 
-    private void displayPolynomial() {
+    @FXML
+    public void onMouseEnteredCanvas(MouseEvent mouseEvent){
+        ((Canvas) mouseEvent.getSource()).getScene().setCursor(Cursor.CROSSHAIR);
+    }
+
+    @FXML
+    public void onMouseExitedCanvas(MouseEvent mouseEvent){
+        ((Canvas) mouseEvent.getSource()).getScene().setCursor(Cursor.DEFAULT);
+    }
+
+    private void setPolynomial(){
         polynomial = new Polynomial(getCoefficientsFromCoefficientSpinners());
         setPolynomialAttributeLabels();
         updateCanvas();
     }
 
-    private void updateCanvas() {
+    private void updateCanvas(){
         clearCanvas();
         drawCoordinateGrid();
         if(polynomial != null){
@@ -131,23 +136,38 @@ public class PolynomialController {
         }
     }
 
-    private void setPolynomialAttributeLabels() {
+    private void setPolynomialAttributeLabels(){
         functionAsStringLabel.setText(polynomial.toString());
         functionTypeLabel.setText(getPolynomialTypeString());
         yInterceptLabel.setText(Double.toString(polynomial.calculateValue(0.0)));
-        zeroPointsLabel.setText(Arrays.toString(polynomial.findZeroPoints()));
+        zeroPointsLabel.setText(getZeroPointsString());
         symmetryLabel.setText(getSymmetryString());
     }
 
-    private String getSymmetryString(){
-        final String symmetry;
-        if (polynomial.isAxisSymmetrical()){
-            symmetry = "Achsensymetrisch";
-        } else if (polynomial.isPointSymmetrical()) {
-            symmetry = "Punktsymetirsch";
+    private String getZeroPointsString(){
+        double[] zeroPoints = polynomial.findZeroPoints();
+        if(zeroPoints.length == 0){
+            return "-";
         }
-        else symmetry = "Keine";
-        return symmetry;
+        else{
+            StringBuilder zeroPointsString = new StringBuilder();
+            for (double zeroPoint : zeroPoints) {
+                zeroPointsString.append("(").append(zeroPoint).append("|").append(polynomial.calculateValue(zeroPoint)).append(")").append(" ");
+            }
+            return zeroPointsString.toString();
+        }
+    }
+
+    private String getSymmetryString(){
+        if (polynomial.isAxisSymmetrical()){
+            return "Achsensymetrisch";
+        }
+        else if (polynomial.isPointSymmetrical()){
+            return "Punktsymetirsch";
+        }
+        else{
+            return "Keine";
+        }
     }
 
     private String getPolynomialTypeString(){
@@ -168,22 +188,23 @@ public class PolynomialController {
         double lastX = (-polynomialCanvas.getWidth() / xScale) / 2;
         double lastY = polynomialToDraw.calculateValue(lastX);
 
-        for (double x = (-polynomialCanvas.getWidth()/2) / xScale; x <= (polynomialCanvas.getWidth()/2) / xScale; x += drawingPrecision){
+        for (double x = (-polynomialCanvas.getWidth() / 2) / xScale; x <= (polynomialCanvas.getWidth() / 2) / xScale; x += drawingPrecision){
             double y = polynomialToDraw.calculateValue(x);
             graphicsContext.strokeLine(adaptXCoordinate(lastX), adaptYCoordinate(lastY), adaptXCoordinate(x), adaptYCoordinate(y));
             lastX = x;
             lastY = y;
         }
+
         highlightZeroPoints();
     }
 
     private double adaptXCoordinate(double mathematicalXCoordinate){
-        return mathematicalXCoordinate * xScale + polynomialCanvas.getWidth()/2;
+        return mathematicalXCoordinate * xScale + polynomialCanvas.getWidth() / 2;
     }
 
     private double adaptYCoordinate(double mathematicalYCoordinate){
-        return -mathematicalYCoordinate * yScale + polynomialCanvas.getHeight()/2;
-    };
+        return -mathematicalYCoordinate * yScale + polynomialCanvas.getHeight() / 2;
+    }
 
     private void drawCoordinateGrid(){
         double canvasWidth = polynomialCanvas.getWidth();
@@ -209,7 +230,7 @@ public class PolynomialController {
             graphicsContext.strokeLine(canvasWidth - xCoord, 0, canvasWidth - xCoord, canvasHeight);
         }
 
-        for (yCoord = canvasHeight / 2; yCoord >= 0; yCoord -= yLineSpacing) {
+        for (yCoord = canvasHeight / 2; yCoord >= 0; yCoord -= yLineSpacing){
             graphicsContext.strokeLine(0, yCoord, canvasWidth, yCoord);
             graphicsContext.strokeLine(0, canvasHeight - yCoord, canvasWidth, canvasHeight - yCoord);
         }
@@ -233,18 +254,10 @@ public class PolynomialController {
     private void highlightZeroPoints(){
         for(double zeroPoint : polynomial.findZeroPoints()){
             graphicsContext.setStroke(Color.GREEN);
-            graphicsContext.setLineWidth(3);
+            graphicsContext.setLineWidth(5);
             graphicsContext.strokeLine(adaptXCoordinate(zeroPoint),adaptYCoordinate(polynomial.calculateValue(zeroPoint)),
                     adaptXCoordinate(zeroPoint),adaptYCoordinate(polynomial.calculateValue(zeroPoint)));
         }
     }
 
-    public void onMouseEnteredCanvas(MouseEvent mouseEvent){
-        System.out.println((Canvas)mouseEvent.getSource());
-        ((Canvas) mouseEvent.getSource()).getScene().setCursor(Cursor.CROSSHAIR);
-    }
-
-    public void onMouseExitedCanvas(MouseEvent mouseEvent){
-        ((Canvas) mouseEvent.getSource()).getScene().setCursor(Cursor.DEFAULT);
-    }
 }
