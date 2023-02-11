@@ -27,6 +27,7 @@ public class PolynomialController {
     public Canvas polynomialCanvas;
     public Slider xScaleSlider;
     public Slider yScaleSlider;
+    public Slider drawingPrecisionSlider;
     private Polynomial polynomial;
     private GraphicsContext graphicsContext;
     private double yScale = 20;
@@ -36,22 +37,34 @@ public class PolynomialController {
 
     @FXML
     public void initialize(){
-        xScaleSlider.setMax(200);
+        //Initialize xScaleSlider
+        xScaleSlider.setMax(polynomialCanvas.getWidth()/2);
         xScaleSlider.setMin(1);
         xScaleSlider.setValue(xScale);
         xScaleSlider.setBlockIncrement(20);
         xScaleSlider.setMajorTickUnit(20);
-        yScaleSlider.setMax(200);
+
+        //Initialize yScaleSlider
+        yScaleSlider.setMax(polynomialCanvas.getHeight()/2);
         yScaleSlider.setMin(1);
         yScaleSlider.setValue(yScale);
         yScaleSlider.setBlockIncrement(20);
         yScaleSlider.setMajorTickUnit(20);
 
+        //Initialize drawingPrecisionSlider
+        drawingPrecisionSlider.setMax(1);
+        drawingPrecisionSlider.setMin(0.01);
+        drawingPrecisionSlider.setValue(0.1);
+        drawingPrecisionSlider.setBlockIncrement(0.01);
+        drawingPrecisionSlider.setMajorTickUnit(0.01);
+
+        //Setting ValueFactories for coefficientSpinners
         coefficient0Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
         coefficient1Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
         coefficient2Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
         coefficient3Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
         coefficient4Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
+
         this.graphicsContext = polynomialCanvas.getGraphicsContext2D();
         drawCoordinateGrid();
     }
@@ -63,20 +76,20 @@ public class PolynomialController {
 
     @FXML
     public void onXSliderMoved() {
-        clearCanvas();
         xScale = xScaleSlider.getValue();
-        drawCoordinateGrid();
-        displayPolynomial();
+        updateCanvas();
     }
 
     @FXML
     public void onYSliderMoved(){
-        clearCanvas();
         yScale = yScaleSlider.getValue();
-        drawCoordinateGrid();
-        displayPolynomial();
-        System.out.println(yScale);
+        updateCanvas();
+    }
 
+    @FXML
+    public void onPrecisionSliderMoved(){
+        drawingPrecision = drawingPrecisionSlider.getValue();
+        updateCanvas();
     }
 
     @FXML
@@ -87,10 +100,17 @@ public class PolynomialController {
     }
 
     private void displayPolynomial() {
-        polynomial = new Polynomial(getCoefficients());
+        polynomial = new Polynomial(getCoefficientsFromCoefficientSpinners());
         setAttributeDisplay();
+        updateCanvas();
+    }
+
+    private void updateCanvas() {
         clearCanvas();
+        drawCoordinateGrid();
+        if(polynomial != null){
         drawPolynomialToCanvas(polynomial);
+        }
     }
 
     private void setAttributeDisplay() {
@@ -124,17 +144,19 @@ public class PolynomialController {
     }
 
     private void drawPolynomialToCanvas(Polynomial polynomialToDraw){
-        drawCoordinateGrid();
         graphicsContext.setStroke(Color.RED);
         graphicsContext.setLineWidth(1);
-        double lastX = (-polynomialCanvas.getWidth()/xScale ) /2;
+
+        double lastX = (-polynomialCanvas.getWidth() / xScale) / 2;
         double lastY = polynomialToDraw.calculateValue(lastX);
+
         for (double x = (-polynomialCanvas.getWidth()/2) / xScale; x <= (polynomialCanvas.getWidth()/2) / xScale; x += drawingPrecision){
             double y = polynomialToDraw.calculateValue(x);
             graphicsContext.strokeLine(adaptXCoordinate(lastX), adaptYCoordinate(lastY), adaptXCoordinate(x), adaptYCoordinate(y));
             lastX = x;
             lastY = y;
         }
+        highlightZeroPoints();
     }
 
     private double adaptXCoordinate(double mathematicalXCoordinate){
@@ -146,23 +168,23 @@ public class PolynomialController {
     };
 
     private void drawCoordinateGrid() {
-        graphicsContext.setStroke(Color.BLACK);
-        graphicsContext.setLineWidth(1);
-
         double canvasWidth = polynomialCanvas.getWidth();
         double canvasHeight = polynomialCanvas.getHeight();
+
+        //Draws x and y axis
+        graphicsContext.setStroke(Color.BLACK);
+        graphicsContext.setLineWidth(1);
         graphicsContext.strokeLine(canvasWidth / 2, 0, canvasWidth / 2, canvasHeight);
         graphicsContext.strokeLine(0, canvasHeight / 2, canvasWidth, canvasHeight / 2);
 
         graphicsContext.setStroke(Color.GRAY);
         graphicsContext.setLineWidth(0.2);
 
-        double xSquares = canvasWidth / xScale;
-        double ySquares = canvasHeight / yScale;
-        System.out.println("Squares:" + xSquares);
+        double columns = canvasWidth / xScale;
+        double rows = canvasHeight / yScale;
         double xCoord, yCoord;
-        double xLineSpacing = canvasWidth/xSquares;
-        double yLineSpacing = canvasHeight/ySquares;
+        double xLineSpacing = canvasWidth/columns;
+        double yLineSpacing = canvasHeight/rows;
 
         for (xCoord = canvasWidth / 2; xCoord >= 0; xCoord -= xLineSpacing) {
             graphicsContext.strokeLine(xCoord, 0, xCoord, canvasHeight);
@@ -183,7 +205,7 @@ public class PolynomialController {
 
     }
 
-    private double[] getCoefficients(){
+    private double[] getCoefficientsFromCoefficientSpinners(){
         final double[] coefficients = new double[5];
         coefficients[0] = coefficient0Spinner.getValue();
         coefficients[1] = coefficient1Spinner.getValue();
@@ -195,5 +217,14 @@ public class PolynomialController {
 
     private void clearCanvas(){
         graphicsContext.clearRect(0,0, polynomialCanvas.getWidth(), polynomialCanvas.getHeight());
+    }
+
+    private void highlightZeroPoints(){
+        for(double zeroPoint : polynomial.findZeroPoints()){
+            graphicsContext.setStroke(Color.GREEN);
+            graphicsContext.setLineWidth(3);
+            graphicsContext.strokeLine(adaptXCoordinate(zeroPoint),adaptYCoordinate(polynomial.calculateValue(zeroPoint)),
+                    adaptXCoordinate(zeroPoint),adaptYCoordinate(polynomial.calculateValue(zeroPoint)));
+        }
     }
 }
