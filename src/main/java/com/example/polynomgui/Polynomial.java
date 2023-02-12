@@ -7,13 +7,14 @@ import java.util.Arrays;
 public class Polynomial {
     final double[] coefficients;
 
+
     public double[] getCoefficients() {
         return coefficients;
     }
 
-    final ArrayList<TurningPoint> maxima = new ArrayList<>();
+    ArrayList<TurningPoint> maxima = new ArrayList<>();
 
-    final ArrayList<TurningPoint> minima = new ArrayList<>();
+    ArrayList<TurningPoint> minima = new ArrayList<>();
     InflectionPoint[] inflectionPoints;
 
     private static final String[] exponentCharacters = {"\u00B2" , "\u00B3", "\u2074"};
@@ -21,7 +22,7 @@ public class Polynomial {
         super();
         this.coefficients = coefficients;
         if (this.getDegree() >= 2) {
-            this.specialPoints();
+            this.findSpecialPoints();
             inflectionPoints = new InflectionPoint[getDegree() - 2];
 
         }
@@ -33,7 +34,7 @@ public class Polynomial {
 
     public String toString() {
         final StringBuilder outputStringBuilder = new StringBuilder();
-        outputStringBuilder.append("f(x) = ");
+        outputStringBuilder.append("ƒ(x) = ");
         int segments = 0;
         for(int i = coefficients.length - 1; i >= 0; i--){
             if (coefficients[i] != 0){
@@ -56,6 +57,18 @@ public class Polynomial {
             segments += 1;
         }}
         return outputStringBuilder.toString();
+    }
+
+    public TurningPoint[] getMaxima() {
+        return maxima.toArray(new TurningPoint[0]);
+    }
+
+    public TurningPoint[] getMinima() {
+        return minima.toArray(new TurningPoint[0]);
+    }
+
+    public InflectionPoint[] getInflectionPoints() {
+        return inflectionPoints;
     }
 
     public double calculateValue(final Double xValue) {
@@ -142,7 +155,7 @@ public class Polynomial {
         }
     }
 
-    private void specialPoints() {
+    private void findSpecialPoints() {
         final Polynomial firstDerivation = this.getDerivation();
         final Polynomial secondDerivation = firstDerivation.getDerivation();
         final double[] firstDerivationZeroPoints = firstDerivation.findZeroPoints();

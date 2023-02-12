@@ -14,6 +14,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
 
+import java.util.ArrayList;
+
 public class PolynomialController {
     public Spinner<Double> coefficient0Spinner;
     public Spinner<Double> coefficient1Spinner;
@@ -45,11 +47,11 @@ public class PolynomialController {
     }
 
     private void initializeSpinners(){
-        coefficient0Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
-        coefficient1Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
-        coefficient2Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
-        coefficient3Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
-        coefficient4Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.1));
+        coefficient0Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.01));
+        coefficient1Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.01));
+        coefficient2Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.01));
+        coefficient3Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.01));
+        coefficient4Spinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(-200, 200,0.0,0.01));
     }
 
     private void initializeSliders(){
@@ -194,7 +196,8 @@ public class PolynomialController {
             lastX = x;
             lastY = y;
         }
-
+        highLightPoints(polynomial.getMinima(),Color.CYAN);
+        highLightPoints(polynomial.getMaxima(),Color.LIME);
         highlightZeroPoints();
     }
 
@@ -257,6 +260,17 @@ public class PolynomialController {
             graphicsContext.setLineWidth(5);
             graphicsContext.strokeLine(adaptXCoordinate(zeroPoint),adaptYCoordinate(polynomial.calculateValue(zeroPoint)),
                     adaptXCoordinate(zeroPoint),adaptYCoordinate(polynomial.calculateValue(zeroPoint)));
+        }
+    }
+
+    private void highLightPoints(SpecialPoint[] specialPoints, Color color){
+        graphicsContext.setStroke(color);
+        graphicsContext.setLineWidth(5);
+        for(SpecialPoint specialPoint : specialPoints){
+            System.out.println(specialPoint.toString());
+            double xCoordinateOnCanvas = adaptXCoordinate(specialPoint.getxValue());
+            double yCoordinateOnCanvas = adaptYCoordinate(specialPoint.getyValue());
+            graphicsContext.strokeLine(xCoordinateOnCanvas, yCoordinateOnCanvas, xCoordinateOnCanvas, yCoordinateOnCanvas);
         }
     }
 

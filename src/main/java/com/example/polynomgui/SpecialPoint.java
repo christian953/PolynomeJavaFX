@@ -1,6 +1,6 @@
 package com.example.polynomgui;
 
-public abstract class SpecialPoint {
+public abstract class SpecialPoint{
     double xValue;
     double yValue;
     public String toString(){
