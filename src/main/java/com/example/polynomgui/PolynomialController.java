@@ -1,5 +1,6 @@
 package com.example.polynomgui;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.canvas.Canvas;
@@ -13,8 +14,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
-
-import java.util.ArrayList;
+import org.jetbrains.annotations.NotNull;
 
 public class PolynomialController {
     public Spinner<Double> coefficient0Spinner;
@@ -115,14 +115,14 @@ public class PolynomialController {
     }
 
     @FXML
-    public void onMouseEnteredCanvas(MouseEvent mouseEvent){
-        ((Canvas) mouseEvent.getSource()).getScene().setCursor(Cursor.CROSSHAIR);
+    public void onResetButtonClicked() {
+        initializeSpinners();
+        this.polynomial = null;
+        resetPolynomialInformation();
+        clearCanvas();
+        drawCoordinateGrid();
     }
 
-    @FXML
-    public void onMouseExitedCanvas(MouseEvent mouseEvent){
-        ((Canvas) mouseEvent.getSource()).getScene().setCursor(Cursor.DEFAULT);
-    }
 
     private void setPolynomial(){
         polynomial = new Polynomial(getCoefficientsFromCoefficientSpinners());
@@ -147,14 +147,14 @@ public class PolynomialController {
     }
 
     private String getZeroPointsString(){
-        double[] zeroPoints = polynomial.findZeroPoints();
+        ZeroPoint[] zeroPoints = polynomial.getZeroPoints();
         if(zeroPoints.length == 0){
             return "-";
         }
         else{
             StringBuilder zeroPointsString = new StringBuilder();
-            for (double zeroPoint : zeroPoints) {
-                zeroPointsString.append("(").append(zeroPoint).append("|").append(polynomial.calculateValue(zeroPoint)).append(")").append(" ");
+            for (ZeroPoint zeroPoint : zeroPoints) {
+                zeroPointsString.append(zeroPoint.toString());
             }
             return zeroPointsString.toString();
         }
@@ -196,9 +196,10 @@ public class PolynomialController {
             lastX = x;
             lastY = y;
         }
+
         highLightPoints(polynomial.getMinima(),Color.CYAN);
         highLightPoints(polynomial.getMaxima(),Color.LIME);
-        highlightZeroPoints();
+        highLightPoints(polynomial.getZeroPoints(), Color.DARKGOLDENROD);
     }
 
     private double adaptXCoordinate(double mathematicalXCoordinate){
@@ -254,15 +255,6 @@ public class PolynomialController {
         graphicsContext.clearRect(0,0, polynomialCanvas.getWidth(), polynomialCanvas.getHeight());
     }
 
-    private void highlightZeroPoints(){
-        for(double zeroPoint : polynomial.findZeroPoints()){
-            graphicsContext.setStroke(Color.GREEN);
-            graphicsContext.setLineWidth(5);
-            graphicsContext.strokeLine(adaptXCoordinate(zeroPoint),adaptYCoordinate(polynomial.calculateValue(zeroPoint)),
-                    adaptXCoordinate(zeroPoint),adaptYCoordinate(polynomial.calculateValue(zeroPoint)));
-        }
-    }
-
     private void highLightPoints(SpecialPoint[] specialPoints, Color color){
         graphicsContext.setStroke(color);
         graphicsContext.setLineWidth(5);
@@ -274,4 +266,11 @@ public class PolynomialController {
         }
     }
 
+    private void resetPolynomialInformation() {
+        this.symmetryLabel.setText("");
+        this.zeroPointsLabel.setText("");
+        this.yInterceptLabel.setText("");
+        this.functionTypeLabel.setText("");
+        this.functionAsStringLabel.setText("");
+    }
 }

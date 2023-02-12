@@ -1,5 +1,7 @@
 package com.example.polynomgui;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.Math;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -123,28 +125,32 @@ public class Polynomial {
         return new Polynomial(derivationCoefficients);
     }
 
-    public double[] findZeroPoints() {
+    public ZeroPoint[] getZeroPoints() {
         final int degree = this.getDegree();
         if (degree <= 2) {
-            final double[] zeroPoints = new double[degree];
+            final ZeroPoint[] zeroPoints = new ZeroPoint[degree];
             if (degree == 0) {
                 return zeroPoints;
             } else if (degree == 1) {
-                final double zeroPoint = -(coefficients[0] / coefficients[1]);
+                final ZeroPoint zeroPoint = new ZeroPoint(-(coefficients[0] / coefficients[1]));
                 zeroPoints[0] = zeroPoint;
             } else {
-                if (coefficients[2] == 1) {
-                    zeroPoints[0] = -(coefficients[1] / 2) + Math.sqrt(Math.pow(coefficients[1] / 2, 2) - coefficients[0]);
-                    zeroPoints[1] = -(coefficients[1] / 2) - Math.sqrt(Math.pow(coefficients[1] / 2, 2) - coefficients[0]);
-                } else {
-                    zeroPoints[0] = -(coefficients[1] / coefficients[2] / 2) + Math.sqrt(Math.pow(coefficients[1] / coefficients[2] / 2, 2) - coefficients[0] / coefficients[2]);
-                    zeroPoints[1] = -(coefficients[1] / coefficients[2] / 2) - Math.sqrt(Math.pow(coefficients[1] / coefficients[2] / 2, 2) - coefficients[0] / coefficients[2]);
-                }
-                return zeroPoints;
+                return findZeroPointsWithPQFormula(zeroPoints);
             }
             return zeroPoints;
         }
-        return new double[0];
+        return new ZeroPoint[0];
+    }
+
+    private ZeroPoint[] findZeroPointsWithPQFormula(ZeroPoint[] zeroPoints) {
+        if (coefficients[2] == 1) {
+            zeroPoints[0] = new ZeroPoint(-(coefficients[1] / 2) + Math.sqrt(Math.pow(coefficients[1] / 2, 2) - coefficients[0]));
+            zeroPoints[1] = new ZeroPoint( -(coefficients[1] / 2) - Math.sqrt(Math.pow(coefficients[1] / 2, 2) - coefficients[0]));
+        } else {
+            zeroPoints[0] = new ZeroPoint(-(coefficients[1] / coefficients[2] / 2) + Math.sqrt(Math.pow(coefficients[1] / coefficients[2] / 2, 2) - coefficients[0] / coefficients[2]));
+            zeroPoints[1] = new ZeroPoint(-(coefficients[1] / coefficients[2] / 2) - Math.sqrt(Math.pow(coefficients[1] / coefficients[2] / 2, 2) - coefficients[0] / coefficients[2]));
+        }
+        return zeroPoints;
     }
 
     private double positive(final double num) {
@@ -158,15 +164,14 @@ public class Polynomial {
     private void findSpecialPoints() {
         final Polynomial firstDerivation = this.getDerivation();
         final Polynomial secondDerivation = firstDerivation.getDerivation();
-        final double[] firstDerivationZeroPoints = firstDerivation.findZeroPoints();
-        //TurningPoints
-        for (final double firstDerivationZeroPoint : firstDerivationZeroPoints) {
-            final double secondDerivationValue = secondDerivation.calculateValue(firstDerivationZeroPoint);
+        final ZeroPoint[] firstDerivationZeroPoints = firstDerivation.getZeroPoints();
+        for (final ZeroPoint firstDerivationZeroPoint : firstDerivationZeroPoints) {
+            final double secondDerivationValue = secondDerivation.calculateValue(firstDerivationZeroPoint.getxValue());
             if (secondDerivationValue > 0) {
-                minima.add(new TurningPoint(firstDerivationZeroPoint, this.calculateValue(firstDerivationZeroPoint)));
+                minima.add(new TurningPoint(firstDerivationZeroPoint.getxValue(), this.calculateValue(firstDerivationZeroPoint.getxValue())));
             }
             else if (secondDerivationValue < 0) {
-                maxima.add(new TurningPoint(firstDerivationZeroPoint, this.calculateValue(firstDerivationZeroPoint)));
+                maxima.add(new TurningPoint(firstDerivationZeroPoint.getxValue(), this.calculateValue(firstDerivationZeroPoint.getxValue())));
             }
         }
     }
