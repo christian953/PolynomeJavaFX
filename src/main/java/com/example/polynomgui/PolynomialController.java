@@ -35,7 +35,7 @@ public class PolynomialController {
     private double xScale = 20;
     private double drawingPrecision = 0.1;
     private final Color polynomialColor = Color.RED;
-    private final Color zeroPointColor = Color.BROWN;
+    private final Color zeroPointColor = Color.PURPLE;
     private final Color maximaPointColor = Color.BLUE;
     private final Color minimaPointColor = Color.GREEN;
     private final Color inflectionPointColor = Color.YELLOW;
