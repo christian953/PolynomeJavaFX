@@ -1,7 +1,5 @@
 package com.example.polynomgui;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.lang.Math;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,25 +7,27 @@ import java.util.Arrays;
 public class Polynomial {
     final double[] coefficients;
 
-
     public double[] getCoefficients() {
         return coefficients;
     }
 
-    ArrayList<TurningPoint> maxima = new ArrayList<>();
+    private final ArrayList<TurningPoint> maxima = new ArrayList<>();
 
-    ArrayList<TurningPoint> minima = new ArrayList<>();
-    InflectionPoint[] inflectionPoints;
+    private final ArrayList<TurningPoint> minima = new ArrayList<>();
+    private final ArrayList<InflectionPoint> inflectionPoints = new ArrayList<>();
+
+    private ZeroPoint[] zeroPoints;
 
     private static final String[] exponentCharacters = {"\u00B2" , "\u00B3", "\u2074"};
+
+    public ZeroPoint[] getZeroPoints() {
+        return zeroPoints;
+    }
+
     Polynomial(final double[] coefficients) {
         super();
         this.coefficients = coefficients;
-        if (this.getDegree() >= 2) {
             this.findSpecialPoints();
-            inflectionPoints = new InflectionPoint[getDegree() - 2];
-
-        }
     }
 
     public boolean equals(Polynomial polynomial){
@@ -36,7 +36,7 @@ public class Polynomial {
 
     public String toString() {
         final StringBuilder outputStringBuilder = new StringBuilder();
-        outputStringBuilder.append("ƒ(x) = ");
+        outputStringBuilder.append("f(x) = ");
         int segments = 0;
         for(int i = coefficients.length - 1; i >= 0; i--){
             if (coefficients[i] != 0){
@@ -70,10 +70,10 @@ public class Polynomial {
     }
 
     public InflectionPoint[] getInflectionPoints() {
-        return inflectionPoints;
+        return inflectionPoints.toArray(new InflectionPoint[0]);
     }
 
-    public double calculateValue(final Double xValue) {
+    public double calculateValue(final double xValue) {
         double sum = 0;
         for(int i = 0; i < coefficients.length; i++){
             sum += coefficients[i] * Math.pow(xValue, i);
@@ -125,19 +125,19 @@ public class Polynomial {
         return new Polynomial(derivationCoefficients);
     }
 
-    public ZeroPoint[] getZeroPoints() {
+    public ZeroPoint[] findZeroPoints() {
         final int degree = this.getDegree();
         if (degree <= 2) {
-            final ZeroPoint[] zeroPoints = new ZeroPoint[degree];
+            final ZeroPoint[] zeroPointsFound = new ZeroPoint[degree];
             if (degree == 0) {
-                return zeroPoints;
+                return zeroPointsFound;
             } else if (degree == 1) {
                 final ZeroPoint zeroPoint = new ZeroPoint(-(coefficients[0] / coefficients[1]));
-                zeroPoints[0] = zeroPoint;
+                zeroPointsFound[0] = zeroPoint;
             } else {
-                return findZeroPointsWithPQFormula(zeroPoints);
+                return findZeroPointsWithPQFormula(zeroPointsFound);
             }
-            return zeroPoints;
+            return zeroPointsFound;
         }
         return new ZeroPoint[0];
     }
@@ -153,6 +153,19 @@ public class Polynomial {
         return zeroPoints;
     }
 
+    private void findInflectionPoints(){
+        Polynomial firstDerivation = this.getDerivation();
+        Polynomial secondDerivation = firstDerivation.getDerivation();
+        ZeroPoint[] secondDerivationZeroPoints = secondDerivation.getZeroPoints();
+        for(ZeroPoint secondDerivationZeroPoint : secondDerivationZeroPoints){
+            System.out.println(secondDerivationZeroPoint.getxValue());
+            System.out.println(this.calculateValue(secondDerivationZeroPoint.getxValue()));
+            InflectionPoint foundInflectionPoint = new InflectionPoint(secondDerivationZeroPoint.getxValue(), this.calculateValue(secondDerivationZeroPoint.getxValue()));
+            System.out.println(foundInflectionPoint);
+            inflectionPoints.add(foundInflectionPoint);
+        }
+    }
+
     private double positive(final double num) {
         if (num > 0){
             return num;
@@ -162,9 +175,19 @@ public class Polynomial {
     }
 
     private void findSpecialPoints() {
-        final Polynomial firstDerivation = this.getDerivation();
-        final Polynomial secondDerivation = firstDerivation.getDerivation();
-        final ZeroPoint[] firstDerivationZeroPoints = firstDerivation.getZeroPoints();
+        this.zeroPoints = findZeroPoints();
+        if(this.getDegree() >= 2){
+            findTurningPoints();
+        }
+        if(this.getDegree() >= 2) {
+            findInflectionPoints();
+        }
+    }
+
+    private void findTurningPoints() {
+        Polynomial firstDerivation = this.getDerivation();
+        Polynomial secondDerivation = firstDerivation.getDerivation();
+        ZeroPoint[] firstDerivationZeroPoints = firstDerivation.findZeroPoints();
         for (final ZeroPoint firstDerivationZeroPoint : firstDerivationZeroPoints) {
             final double secondDerivationValue = secondDerivation.calculateValue(firstDerivationZeroPoint.getxValue());
             if (secondDerivationValue > 0) {
@@ -175,7 +198,6 @@ public class Polynomial {
             }
         }
     }
-
 
 
 }

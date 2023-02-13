@@ -1,20 +1,14 @@
 package com.example.polynomgui;
 
-import javafx.event.ActionEvent;
+import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
-import javafx.scene.Cursor;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
-import org.jetbrains.annotations.NotNull;
 
 public class PolynomialController {
     public Spinner<Double> coefficient0Spinner;
@@ -31,11 +25,22 @@ public class PolynomialController {
     public Slider xScaleSlider;
     public Slider yScaleSlider;
     public Slider drawingPrecisionSlider;
+    public CheckBox zeroPointCheckBox;
+    public CheckBox maximaCheckBox;
+    public CheckBox minimaCheckBox;
+    public CheckBox inflectionPointCheckBox;
     private Polynomial polynomial;
     private GraphicsContext graphicsContext;
     private double yScale = 20;
     private double xScale = 20;
     private double drawingPrecision = 0.1;
+    private final Color polynomialColor = Color.RED;
+    private final Color zeroPointColor = Color.BROWN;
+    private final Color maximaPointColor = Color.BLUE;
+    private final Color minimaPointColor = Color.GREEN;
+    private final Color inflectionPointColor = Color.YELLOW;
+
+
 
 
     @FXML
@@ -44,6 +49,43 @@ public class PolynomialController {
         initializeSpinners();
         this.graphicsContext = polynomialCanvas.getGraphicsContext2D();
         drawCoordinateGrid();
+        initializeCheckboxes();
+    }
+
+    private void initializeCheckboxes() {
+        ChangeListener<Boolean> checkBoxListener = (observableValue, aBoolean, t1) -> {
+            if(polynomial != null) {
+                if (zeroPointCheckBox.isSelected()) {
+                    highLightPoints(polynomial.getZeroPoints(), zeroPointColor);
+                }
+                else {
+                    updateCanvas();
+                }
+                if (maximaCheckBox.isSelected()) {
+                    highLightPoints(polynomial.getMaxima(), maximaPointColor);
+                }
+                else {
+                    updateCanvas();
+                }
+                if (minimaCheckBox.isSelected()) {
+                    highLightPoints(polynomial.getMinima(), minimaPointColor);
+                }
+                else {
+                    updateCanvas();
+                }
+                if (inflectionPointCheckBox.isSelected()) {
+                    highLightPoints(polynomial.getInflectionPoints(), inflectionPointColor);
+                }
+                else {
+                    updateCanvas();
+                }
+            }
+        };
+
+        zeroPointCheckBox.selectedProperty().addListener(checkBoxListener);
+        maximaCheckBox.selectedProperty().addListener(checkBoxListener);
+        minimaCheckBox.selectedProperty().addListener(checkBoxListener);
+        inflectionPointCheckBox.selectedProperty().addListener(checkBoxListener);
     }
 
     private void initializeSpinners(){
@@ -123,7 +165,6 @@ public class PolynomialController {
         drawCoordinateGrid();
     }
 
-
     private void setPolynomial(){
         polynomial = new Polynomial(getCoefficientsFromCoefficientSpinners());
         setPolynomialAttributeLabels();
@@ -184,8 +225,9 @@ public class PolynomialController {
     }
 
     private void drawPolynomialToCanvas(Polynomial polynomialToDraw){
-        graphicsContext.setStroke(Color.RED);
-        graphicsContext.setLineWidth(1);
+        graphicsContext.setStroke(polynomialColor);
+        double polynomialWidth = 1;
+        graphicsContext.setLineWidth(polynomialWidth);
 
         double lastX = (-polynomialCanvas.getWidth() / xScale) / 2;
         double lastY = polynomialToDraw.calculateValue(lastX);
@@ -197,9 +239,18 @@ public class PolynomialController {
             lastY = y;
         }
 
-        highLightPoints(polynomial.getMinima(),Color.CYAN);
-        highLightPoints(polynomial.getMaxima(),Color.LIME);
-        highLightPoints(polynomial.getZeroPoints(), Color.DARKGOLDENROD);
+        if(maximaCheckBox.isSelected()) {
+            highLightPoints(polynomial.getMinima(), maximaPointColor);
+        }
+        if(minimaCheckBox.isSelected()) {
+            highLightPoints(polynomial.getMaxima(), minimaPointColor);
+        }
+        if(zeroPointCheckBox.isSelected()) {
+            highLightPoints(polynomial.getZeroPoints(), zeroPointColor);
+        }
+        if(inflectionPointCheckBox.isSelected()) {
+            highLightPoints(polynomial.getInflectionPoints(), inflectionPointColor);
+        }
     }
 
     private double adaptXCoordinate(double mathematicalXCoordinate){
@@ -259,18 +310,18 @@ public class PolynomialController {
         graphicsContext.setStroke(color);
         graphicsContext.setLineWidth(5);
         for(SpecialPoint specialPoint : specialPoints){
-            System.out.println(specialPoint.toString());
             double xCoordinateOnCanvas = adaptXCoordinate(specialPoint.getxValue());
             double yCoordinateOnCanvas = adaptYCoordinate(specialPoint.getyValue());
             graphicsContext.strokeLine(xCoordinateOnCanvas, yCoordinateOnCanvas, xCoordinateOnCanvas, yCoordinateOnCanvas);
         }
     }
 
-    private void resetPolynomialInformation() {
+    private void resetPolynomialInformation(){
         this.symmetryLabel.setText("");
         this.zeroPointsLabel.setText("");
         this.yInterceptLabel.setText("");
         this.functionTypeLabel.setText("");
         this.functionAsStringLabel.setText("");
     }
+
 }

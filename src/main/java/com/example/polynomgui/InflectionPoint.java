@@ -4,6 +4,8 @@ public class InflectionPoint extends SpecialPoint {
 
     public InflectionPoint(double xValue, double yValue) {
         super();
+        this.xValue = xValue;
+        this.yValue = yValue;
     }
 
     public boolean isRightLeftTurning() {

@@ -8,7 +8,6 @@ public class TurningPoint extends SpecialPoint{
     }
 
 
-
     public boolean isGlobal() {
         return isGlobal;
     }
