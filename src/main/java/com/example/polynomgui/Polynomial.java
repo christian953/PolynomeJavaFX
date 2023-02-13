@@ -158,10 +158,7 @@ public class Polynomial {
         Polynomial secondDerivation = firstDerivation.getDerivation();
         ZeroPoint[] secondDerivationZeroPoints = secondDerivation.getZeroPoints();
         for(ZeroPoint secondDerivationZeroPoint : secondDerivationZeroPoints){
-            System.out.println(secondDerivationZeroPoint.getxValue());
-            System.out.println(this.calculateValue(secondDerivationZeroPoint.getxValue()));
             InflectionPoint foundInflectionPoint = new InflectionPoint(secondDerivationZeroPoint.getxValue(), this.calculateValue(secondDerivationZeroPoint.getxValue()));
-            System.out.println(foundInflectionPoint);
             inflectionPoints.add(foundInflectionPoint);
         }
     }

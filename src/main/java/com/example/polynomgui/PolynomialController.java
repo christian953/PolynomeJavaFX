@@ -52,7 +52,7 @@ public class PolynomialController {
         initializeCheckboxes();
     }
 
-    private void initializeCheckboxes() {
+    private void initializeCheckboxes(){
         ChangeListener<Boolean> checkBoxListener = (observableValue, aBoolean, t1) -> {
             if(polynomial != null) {
                 if (zeroPointCheckBox.isSelected()) {
@@ -60,18 +60,22 @@ public class PolynomialController {
                 }
                 else {
                     updateCanvas();
+                    return;
                 }
                 if (maximaCheckBox.isSelected()) {
                     highLightPoints(polynomial.getMaxima(), maximaPointColor);
                 }
                 else {
                     updateCanvas();
+                    return;
+
                 }
                 if (minimaCheckBox.isSelected()) {
                     highLightPoints(polynomial.getMinima(), minimaPointColor);
                 }
                 else {
                     updateCanvas();
+                    return;
                 }
                 if (inflectionPointCheckBox.isSelected()) {
                     highLightPoints(polynomial.getInflectionPoints(), inflectionPointColor);
@@ -240,10 +244,10 @@ public class PolynomialController {
         }
 
         if(maximaCheckBox.isSelected()) {
-            highLightPoints(polynomial.getMinima(), maximaPointColor);
+            highLightPoints(polynomial.getMaxima(), maximaPointColor);
         }
         if(minimaCheckBox.isSelected()) {
-            highLightPoints(polynomial.getMaxima(), minimaPointColor);
+            highLightPoints(polynomial.getMinima(), minimaPointColor);
         }
         if(zeroPointCheckBox.isSelected()) {
             highLightPoints(polynomial.getZeroPoints(), zeroPointColor);
